@@ -1,0 +1,1354 @@
+/* My password generator - started this at 2am lol */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+    background: black;
+    cursor: none; /* this looks sick */
+}
+
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: #000;
+}
+
+.animated-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* particle stuff for the bg */
+#particleCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* cursor light thingy */
+.cursor-light {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.2) 30%, rgba(255,255,255,0.05) 60%, transparent 80%);
+    border-radius: 50%;
+    filter: blur(40px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+}
+
+.cursor-light.active {
+    opacity: 1;
+}
+
+/* floating circle things - took forever to get right yo */
+.gradient-circle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.6;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gradient-circle.attracted {
+    filter: blur(80px);
+    opacity: 0.9;
+    transform: scale(1.3) !important;
+}
+
+.gradient-circle.repelled {
+    filter: blur(150px);
+    opacity: 0.3;
+    transform: scale(0.7) !important;
+}
+
+/* circle 1 - the big one */
+.circle-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 15%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.05) 70%, transparent 85%);
+    top: 20%;
+    left: 15%;
+    animation: float1 30s ease-in-out infinite;
+}
+
+.circle-2 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.6) 20%, rgba(255,255,255,0.3) 40%, rgba(255,255,255,0.15) 60%, rgba(255,255,255,0.03) 80%, transparent 95%);
+    bottom: 25%;
+    right: 20%;
+    animation: float2 35s ease-in-out infinite;
+}
+
+.circle-3 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.5) 25%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.1) 75%, transparent 90%);
+    top: 55%;
+    left: 45%;
+    animation: float3 25s ease-in-out infinite;
+}
+
+.circle-4 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.2) 60%, rgba(255,255,255,0.05) 80%, transparent 95%);
+    top: 10%;
+    right: 35%;
+    animation: float4 40s ease-in-out infinite;
+}
+
+.circle-5 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.3) 35%, rgba(255,255,255,0.15) 70%, transparent 90%);
+    bottom: 60%;
+    left: 5%;
+    animation: float5 28s ease-in-out infinite;
+}
+
+.circle-6 {
+    width: 380px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.4) 25%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0.04) 80%, transparent 92%);
+    top: 75%;
+    right: 10%;
+    animation: float6 32s ease-in-out infinite;
+}
+
+/* movement animations - these are kinda random but they work */
+@keyframes float1 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    25% {
+        transform: translate(70px, -50px) scale(1.4);
+        opacity: 0.9;
+    }
+    50% {
+        transform: translate(-40px, 80px) scale(0.7);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(50px, 30px) scale(1.2);
+        opacity: 0.7;
+    }
+}
+
+@keyframes float2 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+    30% {
+        transform: translate(-80px, 60px) scale(1.5);
+        opacity: 0.8;
+    }
+    60% {
+        transform: translate(60px, -90px) scale(0.6);
+        opacity: 0.2;
+    }
+    90% {
+        transform: translate(-30px, 40px) scale(1.3);
+        opacity: 0.6;
+    }
+}
+
+@keyframes float3 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.7;
+    }
+    40% {
+        transform: translate(-100px, -60px) scale(1.6);
+        opacity: 0.9;
+    }
+    80% {
+        transform: translate(80px, 70px) scale(0.8);
+        opacity: 0.4;
+    }
+}
+
+@keyframes float4 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+    }
+    35% {
+        transform: translate(120px, 80px) scale(1.7);
+        opacity: 0.8;
+    }
+    70% {
+        transform: translate(-60px, -40px) scale(0.5);
+        opacity: 0.1;
+    }
+}
+
+@keyframes float5 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(90px, -70px) scale(1.3);
+        opacity: 0.8;
+    }
+}
+
+@keyframes float6 {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+    25% {
+        transform: translate(-70px, 50px) scale(1.4);
+        opacity: 0.7;
+    }
+    50% {
+        transform: translate(40px, -80px) scale(0.7);
+        opacity: 0.3;
+    }
+    75% {
+        transform: translate(60px, 60px) scale(1.1);
+        opacity: 0.6;
+    }
+}
+
+/* main content area */
+.content {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    pointer-events: auto;
+    cursor: default;
+}
+
+/* glass effect container - spent way too much time on this */
+.glass-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    padding: 60px 40px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 30px;
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    animation: glassFloat 6s ease-in-out infinite;
+    width: 100%;
+    max-width: 900px;
+    box-sizing: border-box;
+}
+
+@keyframes glassFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.header-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.service-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+    text-shadow:
+        0 0 30px rgba(255, 255, 255, 0.8),
+        0 0 60px rgba(255, 255, 255, 0.6),
+        0 0 90px rgba(255, 255, 255, 0.4);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    0% {
+        text-shadow:
+            0 0 30px rgba(255, 255, 255, 0.8),
+            0 0 60px rgba(255, 255, 255, 0.6),
+            0 0 90px rgba(255, 255, 255, 0.4);
+    }
+    100% {
+        text-shadow:
+            0 0 40px rgba(255, 255, 255, 1),
+            0 0 80px rgba(255, 255, 255, 0.8),
+            0 0 120px rgba(255, 255, 255, 0.6);
+    }
+}
+
+/* made this way brighter after feedback */
+.service-author {
+    font-size: 1.1rem;
+    color: #cccccc;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    opacity: 0.9;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+/* password display area */
+.password-container {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* this was the hardest part - making passwords bright enough */
+.password-display {
+    position: relative;
+    z-index: 5;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #bbbbbb;
+    letter-spacing: 0.1em;
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px 30px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    transition: all 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: clamp(1.2rem, 4vw, 2.5rem);
+}
+
+.password-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.password-display:hover::before {
+    left: 100%;
+}
+
+/* different states for password generation */
+.password-display.preparing {
+    transform: perspective(1000px) rotateX(-15deg) scale(1.1);
+    color: #dddddd;
+    text-shadow:
+        0 0 20px rgba(255, 255, 255, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: clamp(1.3rem, 4.2vw, 2.8rem);
+    text-align: center;
+    justify-content: center;
+}
+
+.password-display.generating {
+    transform: perspective(1000px) rotateY(5deg) scale(1.2);
+    color: transparent;
+    background: linear-gradient(45deg,
+        rgba(255, 255, 255, 0.1),
+        rgba(0, 255, 255, 0.1),
+        rgba(255, 0, 255, 0.1),
+        rgba(255, 255, 255, 0.1));
+    background-size: 400% 400%;
+    animation: quantumShift 2s ease-in-out infinite;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+        0 0 50px rgba(255, 255, 255, 0.3),
+        inset 0 0 50px rgba(255, 255, 255, 0.1);
+    font-size: clamp(1.4rem, 4.5vw, 3rem);
+    text-align: center;
+    justify-content: center;
+}
+
+@keyframes quantumShift {
+    0%, 100% {
+        background-position: 0% 50%;
+        transform: perspective(1000px) rotateY(5deg) scale(1.2);
+    }
+    25% {
+        background-position: 100% 50%;
+        transform: perspective(1000px) rotateY(-2deg) scale(1.25);
+    }
+    50% {
+        background-position: 100% 100%;
+        transform: perspective(1000px) rotateY(3deg) scale(1.15);
+    }
+    75% {
+        background-position: 0% 100%;
+        transform: perspective(1000px) rotateY(-1deg) scale(1.22);
+    }
+}
+
+.password-display.revealing {
+    transform: perspective(1000px) rotateX(0deg) scale(1.3);
+    color: #ffffff;
+    text-shadow:
+        0 0 30px rgba(255, 255, 255, 0.9),
+        0 0 60px rgba(255, 255, 255, 0.7),
+        0 0 90px rgba(255, 255, 255, 0.5),
+        0 0 120px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow:
+        0 0 100px rgba(255, 255, 255, 0.4),
+        inset 0 0 30px rgba(255, 255, 255, 0.2);
+    font-size: clamp(1.5rem, 4.8vw, 3.2rem);
+    text-align: center;
+    justify-content: center;
+}
+
+/* final state - made it super bright */
+.password-display.complete {
+    transform: perspective(1000px) rotateX(0deg) scale(1.4);
+    color: #ffffff;
+    text-shadow:
+        0 0 50px rgba(255, 255, 255, 1),
+        0 0 100px rgba(255, 255, 255, 0.9),
+        0 0 150px rgba(255, 255, 255, 0.7),
+        0 0 200px rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    box-shadow:
+        0 0 200px rgba(255, 255, 255, 0.8),
+        inset 0 0 60px rgba(255, 255, 255, 0.4);
+    animation: finalGlow 2s ease-in-out;
+    font-size: clamp(1.6rem, 5vw, 3.4rem);
+    text-align: center;
+    justify-content: center;
+}
+
+@keyframes finalGlow {
+    0%, 100% {
+        filter: brightness(1.2);
+    }
+    50% {
+        filter: brightness(1.6);
+    }
+}
+
+/* overlay for sci-fi effects during generation */
+.password-generation-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.password-generation-overlay.active {
+    opacity: 1;
+}
+
+/* DNA helix animation */
+.dna-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* energy ring effects */
+.energy-rings {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+.energy-rings::before,
+.energy-rings::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border: 2px solid rgba(0, 255, 255, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: energyPulse 2s ease-in-out infinite;
+}
+
+.energy-rings::before {
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+}
+
+.energy-rings::after {
+    width: 200px;
+    height: 200px;
+    animation-delay: 0.5s;
+    border-color: rgba(255, 0, 255, 0.6);
+}
+
+@keyframes energyPulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* hologram grid effect */
+.hologram-grid {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(90deg, transparent 49%, rgba(0, 255, 255, 0.1) 50%, transparent 51%),
+        linear-gradient(0deg, transparent 49%, rgba(0, 255, 255, 0.1) 50%, transparent 51%);
+    background-size: 20px 20px;
+    animation: gridScan 3s linear infinite;
+    z-index: 3;
+}
+
+@keyframes gridScan {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* floating particles */
+.quantum-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+}
+
+.quantum-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: quantumFloat 3s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes quantumFloat {
+    0%, 100% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-50px) scale(1.5);
+        opacity: 1;
+    }
+}
+
+/* complexity buttons */
+.complexity-section {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.complexity-btn {
+    position: relative;
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #888888;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    min-width: 80px;
+}
+
+.complexity-btn:hover {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.complexity-btn.active {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+        0 0 30px rgba(255, 255, 255, 0.3),
+        inset 0 0 20px rgba(255, 255, 255, 0.1);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    transform: translateY(-3px) scale(1.05);
+}
+
+.complexity-text {
+    position: relative;
+    z-index: 2;
+}
+
+.complexity-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 25px;
+}
+
+.complexity-btn.active .complexity-glow {
+    opacity: 1;
+}
+
+/* button layout - stack them vertically */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* main generation button */
+.genz-button {
+    position: relative;
+    padding: 18px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #000000;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 10px 30px rgba(255, 255, 255, 0.2),
+        0 5px 15px rgba(255, 255, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform: translateY(0);
+    min-width: 200px;
+}
+
+.genz-button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow:
+        0 15px 40px rgba(255, 255, 255, 0.3),
+        0 8px 20px rgba(255, 255, 255, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.genz-button:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.genz-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: translateY(0) scale(1);
+}
+
+.button-text {
+    position: relative;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50px;
+}
+
+.genz-button:hover .button-glow {
+    opacity: 1;
+}
+
+.ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+/* copy button - shows up after generation */
+.copy-button {
+    position: relative;
+    padding: 18px 40px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #888888;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 180px;
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+    box-shadow:
+        0 0 20px rgba(255, 255, 255, 0.1),
+        inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.copy-button:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.copy-button.hidden {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+    pointer-events: none;
+}
+
+.copy-button:hover {
+    transform: translateY(-5px) scale(1.08);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+    box-shadow:
+        0 15px 50px rgba(255, 255, 255, 0.3),
+        0 5px 25px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(255, 255, 255, 0.15);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+.copy-text {
+    position: relative;
+    z-index: 3;
+    transition: all 0.4s ease;
+}
+
+/* insane pulse animation for copy */
+.copy-button.copying {
+    animation: copyPulseWave 1.5s ease-in-out;
+    border-color: rgba(255, 255, 255, 1);
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 1);
+}
+
+@keyframes copyPulseWave {
+    0% {
+        transform: translateY(-5px) scale(1.08);
+        box-shadow:
+            0 15px 50px rgba(255, 255, 255, 0.3),
+            0 5px 25px rgba(255, 255, 255, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.15);
+    }
+    20% {
+        transform: translateY(-8px) scale(1.15);
+        box-shadow:
+            0 25px 80px rgba(255, 255, 255, 0.6),
+            0 10px 40px rgba(255, 255, 255, 0.4),
+            inset 0 0 50px rgba(255, 255, 255, 0.3),
+            0 0 100px rgba(255, 255, 255, 0.8);
+    }
+    40% {
+        transform: translateY(-12px) scale(1.2);
+        box-shadow:
+            0 35px 120px rgba(255, 255, 255, 0.8),
+            0 15px 60px rgba(255, 255, 255, 0.6),
+            inset 0 0 80px rgba(255, 255, 255, 0.4),
+            0 0 150px rgba(255, 255, 255, 1);
+    }
+    60% {
+        transform: translateY(-10px) scale(1.18);
+        box-shadow:
+            0 30px 100px rgba(255, 255, 255, 0.7),
+            0 12px 50px rgba(255, 255, 255, 0.5),
+            inset 0 0 60px rgba(255, 255, 255, 0.35),
+            0 0 120px rgba(255, 255, 255, 0.9);
+    }
+    80% {
+        transform: translateY(-6px) scale(1.12);
+        box-shadow:
+            0 20px 70px rgba(255, 255, 255, 0.5),
+            0 8px 35px rgba(255, 255, 255, 0.3),
+            inset 0 0 40px rgba(255, 255, 255, 0.25),
+            0 0 80px rgba(255, 255, 255, 0.7);
+    }
+    100% {
+        transform: translateY(-5px) scale(1.08);
+        box-shadow:
+            0 15px 50px rgba(255, 255, 255, 0.3),
+            0 5px 25px rgba(255, 255, 255, 0.2),
+            inset 0 0 30px rgba(255, 255, 255, 0.15);
+    }
+}
+
+.copy-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50px;
+}
+
+.copy-button:hover .copy-glow {
+    opacity: 1;
+    animation: copyGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes copyGlowPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.2;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.6;
+    }
+}
+
+/* click effects */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    pointer-events: none;
+    animation: rippleEffect 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes rippleEffect {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* button click animation */
+.genz-button.clicked {
+    animation: epicClick 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes epicClick {
+    0% {
+        transform: translateY(-3px) scale(1.02);
+    }
+    15% {
+        transform: translateY(-8px) scale(1.1) rotate(2deg);
+        box-shadow:
+            0 25px 60px rgba(255, 255, 255, 0.4),
+            0 15px 30px rgba(255, 255, 255, 0.3),
+            0 0 50px rgba(255, 255, 255, 0.5);
+    }
+    30% {
+        transform: translateY(-5px) scale(1.15) rotate(-1deg);
+        background: linear-gradient(135deg, #ffffff 0%, #fefefe 50%, #ffffff 100%);
+    }
+    45% {
+        transform: translateY(-10px) scale(1.05) rotate(1deg);
+    }
+    60% {
+        transform: translateY(-3px) scale(1.08) rotate(0deg);
+    }
+    75% {
+        transform: translateY(-6px) scale(1.03);
+    }
+    90% {
+        transform: translateY(-2px) scale(1.01);
+    }
+    100% {
+        transform: translateY(-3px) scale(1.02);
+    }
+}
+
+/* sparkles for button */
+.sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkleAnimation 1.5s ease-out forwards;
+}
+
+@keyframes sparkleAnimation {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1) rotate(180deg);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* shockwave on click */
+.shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    transform: translate(-50%, -50%);
+    animation: shockwaveAnimation 0.8s ease-out forwards;
+}
+
+@keyframes shockwaveAnimation {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        width: 300px;
+        height: 300px;
+        opacity: 0;
+    }
+}
+
+/* responsive stuff - mobile is tricky */
+@media (max-width: 768px) {
+    body {
+        cursor: default;
+    }
+
+    .cursor-light {
+        width: 150px;
+        height: 150px;
+        filter: blur(30px);
+    }
+
+    .gradient-circle {
+        filter: blur(100px);
+        opacity: 0.6;
+    }
+
+    .circle-1, .circle-2 {
+        width: 350px;
+        height: 350px;
+    }
+
+    .circle-3, .circle-4, .circle-6 {
+        width: 300px;
+        height: 300px;
+    }
+
+    .circle-5 {
+        width: 250px;
+        height: 250px;
+    }
+
+    .glass-container {
+        padding: 30px 20px;
+        gap: 25px;
+        margin: 10px;
+        max-width: calc(100vw - 20px);
+    }
+
+    .service-title {
+        font-size: 2.5rem;
+    }
+
+    .service-author {
+        font-size: 1rem;
+    }
+
+    .password-container {
+        height: 100px;
+    }
+
+    .password-display {
+        padding: 15px 20px;
+        font-size: clamp(1rem, 3.5vw, 1.8rem);
+    }
+
+    .password-display.preparing {
+        font-size: clamp(1.1rem, 3.8vw, 2rem);
+    }
+
+    .password-display.generating {
+        font-size: clamp(1.2rem, 4vw, 2.2rem);
+    }
+
+    .password-display.revealing {
+        font-size: clamp(1.3rem, 4.2vw, 2.4rem);
+    }
+
+    .password-display.complete {
+        font-size: clamp(1.4rem, 4.5vw, 2.6rem);
+    }
+
+    .complexity-section {
+        gap: 15px;
+    }
+
+    .complexity-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+        min-width: 70px;
+    }
+
+    .genz-button, .copy-button {
+        padding: 15px 35px;
+        font-size: 1.1rem;
+        min-width: 180px;
+    }
+
+    .energy-rings {
+        width: 200px;
+        height: 200px;
+    }
+
+    .energy-rings::before {
+        width: 100px;
+        height: 100px;
+    }
+
+    .energy-rings::after {
+        width: 130px;
+        height: 130px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cursor-light {
+        width: 120px;
+        height: 120px;
+        filter: blur(25px);
+    }
+
+    .gradient-circle {
+        filter: blur(80px);
+        opacity: 0.5;
+    }
+
+    .circle-1, .circle-2 {
+        width: 250px;
+        height: 250px;
+    }
+
+    .circle-3, .circle-4, .circle-6 {
+        width: 200px;
+        height: 200px;
+    }
+
+    .circle-5 {
+        width: 180px;
+        height: 180px;
+    }
+
+    .glass-container {
+        padding: 20px 15px;
+        gap: 20px;
+        margin: 5px;
+        max-width: calc(100vw - 10px);
+    }
+
+    .service-title {
+        font-size: 2rem;
+    }
+
+    .service-author {
+        font-size: 0.9rem;
+    }
+
+    .password-container {
+        height: 80px;
+    }
+
+    .password-display {
+        padding: 12px 15px;
+        font-size: clamp(0.9rem, 3vw, 1.4rem);
+    }
+
+    .complexity-section {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .complexity-btn {
+        padding: 8px 16px;
+        font-size: 0.8rem;
+        min-width: 60px;
+    }
+
+    .genz-button, .copy-button {
+        padding: 12px 30px;
+        font-size: 1rem;
+        min-width: 160px;
+    }
+
+    .energy-rings {
+        width: 150px;
+        height: 150px;
+    }
+
+    .energy-rings::before {
+        width: 80px;
+        height: 80px;
+    }
+
+    .energy-rings::after {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* tiny screens */
+@media (max-width: 320px) {
+    .glass-container {
+        padding: 15px 10px;
+        margin: 2px;
+        max-width: calc(100vw - 4px);
+    }
+
+    .service-title {
+        font-size: 1.8rem;
+    }
+
+    .password-container {
+        height: 70px;
+    }
+
+    .password-display {
+        padding: 10px 12px;
+        font-size: clamp(0.8rem, 2.8vw, 1.2rem);
+    }
+
+    .complexity-btn {
+        padding: 6px 12px;
+        font-size: 0.7rem;
+        min-width: 50px;
+    }
+}
+
+/* touch device tweaks */
+@media (hover: none) and (pointer: coarse) {
+    .gradient-circle {
+        transition: all 0.4s ease;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* accessibility - disable animations if user prefers */
+@media (prefers-reduced-motion: reduce) {
+    .gradient-circle {
+        animation: none;
+        opacity: 0.4;
+        transition: none;
+    }
+
+    .cursor-light {
+        transition: none;
+    }
+
+    .glass-container {
+        animation: none;
+    }
+
+    .service-title {
+        animation: none;
+    }
+
+    .genz-button.clicked {
+        animation: none;
+    }
+
+    .copy-button.copying {
+        animation: none;
+    }
+
+    .copy-glow {
+        animation: none;
+    }
+
+    .ripple {
+        animation: none;
+    }
+
+    .sparkle {
+        animation: none;
+    }
+
+    .shockwave {
+        animation: none;
+    }
+
+    .password-display {
+        animation: none;
+    }
+
+    .energy-rings::before,
+    .energy-rings::after {
+        animation: none;
+    }
+
+    .hologram-grid {
+        animation: none;
+    }
+
+    .quantum-particle {
+        animation: none;
+    }
+
+    body {
+        cursor: default;
+    }
+}
+
+/* social links at bottom */
+.fixed-social-buttons {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 24px;
+    z-index: 1000;
+}
+
+.social-btn {
+    display: inline-block;
+    padding: 14px 36px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,0.45);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 40px;
+    box-shadow:
+        0 4px 24px rgba(0,0,0,0.25),
+        0 1px 0 rgba(255,255,255,0.08) inset;
+    backdrop-filter: blur(10px);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.social-btn:hover {
+    background: rgba(0,0,0,0.7);
+    border-color: rgba(255,255,255,0.18);
+    color: #fff;
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.35),
+        0 2px 0 rgba(255,255,255,0.12) inset;
+    text-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+
+@media (max-width: 768px) {
+    .fixed-social-buttons {
+        gap: 14px;
+        bottom: 16px;
+    }
+    .social-btn {
+        padding: 10px 22px;
+        font-size: 1rem;
+    }
+}

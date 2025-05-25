@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hi, GenZ! - Password Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background stuff with floating circles -->
+    <div class="background-container" id="backgroundContainer">
+        <div class="animated-bg" id="animatedBg">
+            <div class="gradient-circle circle-1" id="circle1"></div>
+            <div class="gradient-circle circle-2" id="circle2"></div>
+            <div class="gradient-circle circle-3" id="circle3"></div>
+            <div class="gradient-circle circle-4" id="circle4"></div>
+            <div class="gradient-circle circle-5" id="circle5"></div>
+            <div class="gradient-circle circle-6" id="circle6"></div>
+            <div class="cursor-light" id="cursorLight"></div>
+            <canvas id="particleCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="content">
+        <div class="glass-container">
+            <!-- Title and stuff -->
+            <div class="header-section">
+                <h1 class="service-title">Hi, GenZ!</h1>
+                <p class="service-author">by xd3ll with <3</p>
+            </div>
+
+            <!-- Where the password shows up -->
+            <div class="password-container">
+                <div class="password-display" id="passwordDisplay">0000-0000-0000-0000</div>
+                <!-- Sci-fi overlay for generation effects -->
+                <div class="password-generation-overlay" id="generationOverlay">
+                    <canvas class="dna-canvas" id="dnaCanvas"></canvas>
+                    <div class="energy-rings"></div>
+                    <div class="hologram-grid"></div>
+                    <div class="quantum-particles"></div>
+                </div>
+            </div>
+
+            <!-- Mode selection buttons -->
+            <div class="complexity-section">
+                <button class="complexity-btn active" data-complexity="chill" id="chillBtn">
+                    <span class="complexity-text">Chill</span>
+                    <div class="complexity-glow"></div>
+                </button>
+                <button class="complexity-btn" data-complexity="lit" id="litBtn">
+                    <span class="complexity-text">Lit</span>
+                    <div class="complexity-glow"></div>
+                </button>
+                <button class="complexity-btn" data-complexity="fire" id="fireBtn">
+                    <span class="complexity-text">Fire</span>
+                    <div class="complexity-glow"></div>
+                </button>
+            </div>
+
+            <!-- Main buttons -->
+            <div class="action-buttons">
+                <!-- Generate button -->
+                <button class="genz-button" id="genzButton">
+                    <span class="button-text">GenZ Password!</span>
+                    <div class="button-glow"></div>
+                    <div class="ripple-container"></div>
+                </button>
+
+                <!-- Copy button (hidden until password is generated) -->
+                <button class="copy-button hidden" id="copyButton">
+                    <span class="copy-text">Gimme that</span>
+                    <div class="copy-fill"></div>
+                    <div class="copy-glow"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social links at the bottom -->
+    <div class="fixed-social-buttons">
+        <a href="https://t.me/delcode" target="_blank" class="social-btn">Telegram</a>
+        <a href="https://github.com/" target="_blank" class="social-btn">GitHub</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
