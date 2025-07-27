@@ -1,22 +1,20 @@
-# Hi, GenZ! 🚀
+<!-- PROJECT HEADER -->
+<h1 align="center">Hi, GenZ! 🔥</h1>
+<p align="center">
+  <em>Epic passcodes that shine 🚀</em><br>
+  <img src="https://img.shields.io/github/license/DELMEERs/Hi_GenZ?style=flat-square"/>
+  <img src="https://img.shields.io/github/deployments/DELMEERs/Hi_GenZ/github-pages?label=pages&style=flat-square"/>
+  <img src="https://img.shields.io/github/languages/top/DELMEERs/Hi_GenZ?style=flat-square"/>
+</p>
 
-> "Epic passcodes that shine."
+## ✨ Особенности
+- **Три шаблона паролей**: Chill, Lit, Fire (812 квадр. лет на взлом 🚨)
+- Кинематографичные анимации + смещение курсора
+- Светлая и тёмная тема (тоггл в правом верхнем углу)
+- Кнопка копирования + визуальный «shockwave»
 
-## About
-Yo, welcome to "Hi, GenZ!" – the password generator that's totally lit! 🌟
+## 🚀 Live-демо
+Запустите приложение прямо сейчас: **[Hi GenZ →](https://delmeers.github.io/Hi_GenZ/)**
 
-We've got three dope templates: "Chill", "Lit", and "Fire", each with different levels of password strength. The "Fire" level? It's so secure, it'll take hackers over 812 quadrillion years to crack it! 😎
-
-## Features
-- Generate passwords with three templates: "Chill", "Lit", "Fire"
-- Enjoy a modern, fashionable interface that's straight-up wow-worthy
-- Get passwords that are super secure, especially at the "Fire" level
-
-## How to Use
-Just head over to the website, pick your difficulty, сlick the "GenZ Password!" button, and boom – you've got an awesome password 🔥
-
-## Live Demo
-Experience "Hi, GenZ!" -> [Try the app here](https://delmeers.github.io/Hi_GenZ/)
-
-## Contact
-Got questions or just wanna chat? Hit up [@xd3ll_](https://x.com/xd3ll_) on X! I also have my own [Telegram channel](https://t.me/delcode)! Jump in!
+## 🛠️ Стек
+HTML • CSS (Glassmorphism) • Vanilla JS • Canvas API
