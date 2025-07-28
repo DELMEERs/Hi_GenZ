@@ -1,0 +1,375 @@
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Main generate button */
+.genz-button {
+    position: relative;
+    padding: 20px 40px;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--border-radius-large);
+    color: #ffffff;
+    font-size: 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.4s var(--transition-smooth);
+    backdrop-filter: blur(15px);
+    overflow: hidden;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    min-width: 250px;
+}
+
+.genz-button:hover {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.25) 0%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(255, 255, 255, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.genz-button:active {
+    transform: translateY(-1px) scale(1.01);
+}
+
+.genz-button.clicked {
+    animation: buttonClicked 1.2s ease-out;
+}
+
+.genz-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.button-text {
+    position: relative;
+    z-index: 2;
+    display: block;
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.3) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--border-radius-large);
+}
+
+.genz-button:hover .button-glow {
+    opacity: 1;
+    animation: buttonGlow 2s ease-in-out infinite;
+}
+
+/* Ripple effect container */
+.ripple-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--border-radius-large);
+}
+
+.ripple {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transform: scale(0);
+    animation: rippleEffect 0.8s ease-out;
+    pointer-events: none;
+}
+
+/* Copy button */
+.copy-button {
+    position: relative;
+    padding: 15px 30px;
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid rgba(0, 255, 0, 0.3);
+    border-radius: var(--border-radius-medium);
+    color: rgba(0, 255, 0, 0.9);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s var(--transition-smooth);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    opacity: 1;
+    transform: translateY(0);
+    min-width: 200px;
+    box-shadow: 0 4px 15px rgba(0, 255, 0, 0.1);
+}
+
+.copy-button.hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.copy-button:hover {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: rgba(0, 255, 0, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 25px rgba(0, 255, 0, 0.2),
+        0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.copy-button.copying {
+    animation: copyPulse 2s ease-out;
+}
+
+.copy-text {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.copy-fill {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 255, 0, 0.3) 50%, 
+        transparent 100%);
+    transition: left 0.6s ease;
+}
+
+.copy-button.copying .copy-fill {
+    left: 100%;
+}
+
+.copy-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, 
+        rgba(0, 255, 0, 0.2) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--border-radius-medium);
+}
+
+.copy-button:hover .copy-glow {
+    opacity: 1;
+}
+
+/* Light version button */
+.light-version-btn {
+    position: relative;
+    padding: 12px 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-medium);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.light-version-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+.light-text {
+    position: relative;
+    z-index: 2;
+}
+
+.light-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--border-radius-medium);
+}
+
+.light-version-btn:hover .light-glow {
+    opacity: 1;
+}
+
+/* Animation keyframes */
+@keyframes buttonClicked {
+    0% {
+        transform: translateY(-3px) scale(1.02);
+    }
+    15% {
+        transform: translateY(-8px) scale(1.05);
+        box-shadow: 
+            0 20px 50px rgba(0, 0, 0, 0.5),
+            0 0 60px rgba(255, 255, 255, 0.5);
+    }
+    30% {
+        transform: translateY(-5px) scale(1.03);
+    }
+    100% {
+        transform: translateY(-3px) scale(1.02);
+    }
+}
+
+@keyframes buttonGlow {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes rippleEffect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@keyframes copyPulse {
+    0%, 100% {
+        transform: translateY(-2px) scale(1);
+    }
+    25% {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 
+            0 10px 30px rgba(0, 255, 0, 0.3),
+            0 0 30px rgba(0, 255, 0, 0.4);
+    }
+    50% {
+        transform: translateY(-2px) scale(1);
+    }
+}
+
+/* Effect elements for button interactions */
+.shockwave {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: shockwaveExpand 0.8s ease-out;
+    pointer-events: none;
+    z-index: 9998;
+}
+
+.sparkle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #fff 0%, transparent 70%);
+    border-radius: 50%;
+    animation: sparkleFloat 1.5s ease-out forwards;
+    pointer-events: none;
+    z-index: 9997;
+}
+
+@keyframes shockwaveExpand {
+    to {
+        transform: translate(-50%, -50%) scale(8);
+        opacity: 0;
+    }
+}
+
+@keyframes sparkleFloat {
+    0% {
+        opacity: 1;
+        transform: scale(0) rotate(0deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0) rotate(360deg);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .action-buttons {
+        gap: 18px;
+        max-width: 350px;
+    }
+    
+    .genz-button {
+        padding: 18px 35px;
+        font-size: 1.2rem;
+        min-width: 220px;
+    }
+    
+    .copy-button {
+        padding: 13px 25px;
+        font-size: 1rem;
+        min-width: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        gap: 15px;
+        max-width: 100%;
+    }
+    
+    .genz-button {
+        padding: 16px 30px;
+        font-size: 1.1rem;
+        min-width: 200px;
+    }
+    
+    .copy-button {
+        padding: 12px 22px;
+        font-size: 0.95rem;
+        min-width: 160px;
+    }
+    
+    .light-version-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}

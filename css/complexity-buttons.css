@@ -1,0 +1,134 @@
+/* Complexity selection buttons */
+.complexity-section {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.complexity-btn {
+    position: relative;
+    padding: 15px 25px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius-medium);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s var(--transition-smooth);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    min-width: 100px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.complexity-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.complexity-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(255, 255, 255, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.complexity-btn.active .complexity-glow {
+    opacity: 1;
+    animation: complexityPulse 2s ease-in-out infinite;
+}
+
+.complexity-text {
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.complexity-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, 
+        rgba(255, 255, 255, 0.2) 0%, 
+        transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--border-radius-medium);
+}
+
+/* Different complexity button themes */
+.complexity-btn[data-complexity="chill"]:hover,
+.complexity-btn[data-complexity="chill"].active {
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(0, 255, 0, 0.3);
+}
+
+.complexity-btn[data-complexity="lit"]:hover,
+.complexity-btn[data-complexity="lit"].active {
+    border-color: rgba(255, 165, 0, 0.6);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(255, 165, 0, 0.3);
+}
+
+.complexity-btn[data-complexity="fire"]:hover,
+.complexity-btn[data-complexity="fire"].active {
+    border-color: rgba(255, 0, 0, 0.6);
+    box-shadow: 
+        0 8px 25px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(255, 0, 0, 0.3);
+}
+
+@keyframes complexityPulse {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .complexity-section {
+        gap: 12px;
+    }
+    
+    .complexity-btn {
+        padding: 12px 20px;
+        font-size: 0.9rem;
+        min-width: 85px;
+    }
+}
+
+@media (max-width: 480px) {
+    .complexity-section {
+        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .complexity-btn {
+        padding: 12px 25px;
+        width: 200px;
+        max-width: 100%;
+    }
+}

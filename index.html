@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hi, GenZ! - Password Generator</title>
+    <meta name="description" content="A GenZ-style password generator with customizable complexity levels and sci-fi effects">
+    <meta name="keywords" content="password generator, security, GenZ, random password">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Background stuff with floating circles -->
+    <!-- Dynamic background with floating elements -->
     <div class="background-container" id="backgroundContainer">
         <div class="animated-bg" id="animatedBg">
             <div class="gradient-circle circle-1" id="circle1"></div>
@@ -21,19 +23,18 @@
         </div>
     </div>
 
-    <!-- Main content area -->
+    <!-- Main content container -->
     <div class="content">
-        <div class="glass-container">
-            <!-- Title and stuff -->
+        <div class="glass-container glass">
+            <!-- Application header -->
             <div class="header-section">
-                <h1 class="service-title">Hi, GenZ!</h1>
-                <p class="service-author">by xd3ll with <3</p>
+                <h1 class="service-title title">Hi, GenZ!</h1>
+                <p class="service-author subtitle">by xd3ll with ❤️</p>
             </div>
 
-            <!-- Where the password shows up -->
+            <!-- Password display area with generation effects -->
             <div class="password-container">
                 <div class="password-display" id="passwordDisplay">0000-0000-0000-0000</div>
-                <!-- Sci-fi overlay for generation effects -->
                 <div class="password-generation-overlay" id="generationOverlay">
                     <canvas class="dna-canvas" id="dnaCanvas"></canvas>
                     <div class="energy-rings"></div>
@@ -42,7 +43,7 @@
                 </div>
             </div>
 
-            <!-- Mode selection buttons -->
+            <!-- Complexity level selection -->
             <div class="complexity-section">
                 <button class="complexity-btn active" data-complexity="chill" id="chillBtn">
                     <span class="complexity-text">Chill</span>
@@ -58,23 +59,20 @@
                 </button>
             </div>
 
-            <!-- Main buttons -->
+            <!-- Action buttons -->
             <div class="action-buttons">
-                <!-- Generate button -->
                 <button class="genz-button" id="genzButton">
                     <span class="button-text">GenZ Password!</span>
                     <div class="button-glow"></div>
                     <div class="ripple-container"></div>
                 </button>
 
-                <!-- Copy button (hidden until password is generated) -->
                 <button class="copy-button hidden" id="copyButton">
                     <span class="copy-text">Gimme that</span>
                     <div class="copy-fill"></div>
                     <div class="copy-glow"></div>
                 </button>
 
-                <!-- Light version button -->
                 <button class="light-version-btn" onclick="window.location.href='./light/'">
                     <span class="light-text">Light Version</span>
                     <div class="light-glow"></div>
@@ -83,12 +81,12 @@
         </div>
     </div>
 
-    <!-- Social links at the bottom -->
+    <!-- Social links -->
     <div class="fixed-social-buttons">
-        <a href="https://t.me/delcode" target="_blank" class="social-btn">Telegram</a>
-        <a href="https://github.com/DELMEERs/Hi_GenZ" target="_blank" class="social-btn">GitHub</a>
+        <a href="https://t.me/delcode" target="_blank" class="social-btn" rel="noopener">Telegram</a>
+        <a href="https://github.com/DELMEERs/Hi_GenZ" target="_blank" class="social-btn" rel="noopener">GitHub</a>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

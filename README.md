@@ -1,17 +1,17 @@
 <div align="center">
 
-# 🔥 Hi, GenZ! — Epic Password Generator 
+# 🔥 Hi, GenZ! — Epic Password Generator
 
 <img src="https://socialify.git.ci/DELMEERs/Hi_GenZ/image?description=1&forks=1&issues=1&language=1&name=1&pattern=Plus&pulls=1&stargazers=1&theme=Dark" alt="Hi, GenZ banner" width="640" height="320" />
 
-**Создавай пароли, которые светятся! 🚀**  
-*Современный генератор паролей с кинематографичным дизайном*
+**Create passwords that shine! 🚀**  
+
+>  This project is also available in [Russian](README.ru.md).
+
 
 </div>
 
----
-
-## 📊 Статус проекта
+## 📊 Project Status
 
 <div align="center">
 
@@ -22,40 +22,29 @@
 
 </div>
 
----
-
 ## 🎯 Live Demo
 
 <div align="center">
 
-### 🌟 [Попробуй прямо сейчас →](https://delmeers.github.io/Hi_GenZ/)
-
-<!-- TODO: Скриншот  -->
+### 🌟 [Try it now →](https://delmeers.github.io/Hi_GenZ/)
 
 </div>
 
----
+## ✨ Features
 
-## ✨ Особенности
+### 🔐 Three epic tiers
 
-### 🔐 Три уровня эпичности:
-- **🔥 FIRE** — Пароли, которые не взломать веками (> 10^12 лет)
-- **🚀 LIT** — Надежные пароли для серьезных дел  
-- **😎 CHILL** — Простые, но крепкие пароли
+- **🔥 FIRE** — virtually uncrackable (~ 10^12 years)
+- **🚀 LIT** — strong enough for accounts
+- **😎 CHILL** — simple yet solid
 
-### 🎨 Дизайн будущего:
-- **Glassmorphism UI** — Современный стеклянный эффект
-- **Кинематографичные анимации** — Каждый клик как в фильме
 
-### ⚡ Технические фишки:
-- **Canvas API** — Плавные визуальные эффекты
-- **Vanilla JavaScript** — Без лишних зависимостей
-- **PWA Ready** — Работает оффлайн
-- **Security First** — Генерация происходит локально
+### 🎨 Future-proof design
 
----
+- **Glassmorphism UI** — stylish “glass” look
+- **Cinematic animations** — every click feels like a movie scene
 
-## 🛠️ Технологический стек
+## 🛠️ Tech Stack
 
 <div align="center">
 
@@ -66,129 +55,121 @@
 
 </div>
 
----
+## 🚀 Quick Start
 
-## 🚀 Быстрый старт
+### 📋 Requirements
 
-### 📋 Требования
-- Современный браузер с поддержкой ES6+
-- Веб-сервер для локальной разработки (опционально)
+- Modern browser with ES6+ support
+- Local web server (optional)
 
----
 
-## 📁 Структура проекта
+## 🏁 Local Development
 
+> Two effortless ways to spin up a local server.
+
+### 1. Python 3 built-in server
+
+```bash
+# In the project root
+python -m http.server 8000
 ```
 
+Open `http://localhost:8000` in your browser.
+
+### 2. Node.js http-server
+
+```bash
+npm i -g http-server
+http-server -p 8000
+```
+
+Navigate to `http://localhost:8000`.
+
+## 📁 Project Structure
+
+```
 Hi_GenZ/
-├── 📄 index.html          \# Главная страница
-├── 🎨 styles.css          \# Стили и анимации
-├── ⚡ script.js           \# Логика генерации
-├── 🌅 light/              \# Простая версия
-│   ├── index.html
-│   ├── styles.css
-│   └── script.js
-├── 📜 LICENSE            \# MIT лицензия
-└── 📖 README.md          \# Этот файл :D
-
+├── index.html              # Main application HTML
+├── script.js               # Main application entry point
+├── styles.css              # CSS imports
+├── css/                    # Modular CSS files
+│   ├── base.css           # Base styles and variables
+│   ├── background.css     # Background animations
+│   ├── layout.css         # Layout and containers
+│   ├── password-display.css # Password display components
+│   ├── complexity-buttons.css # Complexity selection UI
+│   └── buttons.css        # Action buttons and effects
+├── js/                    # Modular JavaScript files
+│   ├── config.js          # Configuration and constants
+│   ├── utils.js           # Utility functions
+│   ├── password-generator.js # Password generation logic
+│   ├── particle-system.js # Particle effects manager
+│   ├── background-manager.js # Background interactions
+│   └── password-display.js # Password display animations
+├── light/                 # Light version of the app
+└── README.md             # This file ^^
 ```
 
----
 
-## 🎮 Использование
+## 🎮 How to Use
 
-### 1️⃣ Выбери свой стиль
-Кликни на одну из кнопок уровня сложности:
-- **CHILL** — для тестов и не серьезных задач
-- **LIT** — для альтернативных аккаунтов  
-- **FIRE** — для соц. сетей и аккаунтов
+1. **Pick a tier** — CHILL / LIT / FIRE
+2. **Get your password** — auto-generated instantly
+3. **Copy** — one click to clipboard
 
-### 2️⃣ Получи пароль
-Система сгенерирует пароль
+## 🔒 Security
 
-### 3️⃣ Скопируй результат
-Один клик на кнопку копирования — и пароль в буфере обмена
+- Purely local generation
+- Zero logging
 
-### 🔄 Смена версии
-Кликни на переключатель в внизу
+Approximate brute-force time:
 
----
 
-## 🔒 Безопасность
+| Tier | Time to crack |
+| :-- | :-- |
+| CHILL | > 10^8 years |
+| LIT | > 10^10 years |
+| FIRE | > 10^12 years |
 
-### 🛡️ Алгоритм генерации:
-- **Криптографически стойкий** генератор случайных чисел
-- **Локальная генерация** — данные не покидают устройство
-- **Без логирования** — пароли не сохраняются нигде
-
-### 📈 Время взлома (приблизительно):
-- **CHILL**: > 10^8 лет при bruteforce
-- **LIT**: > 10^10 лет при bruteforce  
-- **FIRE**: > 10^12 лет при bruteforce
-
----
-
-## 📈 Статистика проекта
+## 📈 Stats
 
 <div align="center">
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=DELMEERs&repo=Hi_GenZ&show_icons=true&theme=tokyonight&hide_border=true)
 ![Language Stats](https://github-readme-stats.vercel.app/api/top-langs/?username=DELMEERs&layout=compact&theme=tokyonight&hide_border=true)
 
 </div>
 
----
-
 ## 🏆 Roadmap
 
-### 🚧 В разработке:
-- [ ] **API интеграция** — HaveIBeenPwned проверка
-- [ ] **Экспорт** — CSV/JSON форматы
+- [ ] **API integration** — HaveIBeenPwned
+- [ ] **Export** — CSV/JSON support
+- [x] **v1.0** — initial release
 
-### ✅ Выполнено:
-- [x] **v1.0** — Базовая функциональность
-- [x] **Релиз** — Полная поддержка
 
----
+## 🐛 Found a Bug?
 
-## 🐛 Нашли баг?
+Open an issue and include: browser, device, steps, expected behavior, and screenshot.
 
-### Создайте issue с описанием:
-1. 🖥️ **Браузер и ОС**
-2. 📱 **Устройство** (desktop/mobile)
-3. 🔍 **Шаги воспроизведения**
-4. 🎯 **Ожидаемое поведение**
-5. 📸 **Скриншот** (если возможно)
+## 📄 License
 
----
+Distributed under the **MIT License**.
+See [LICENSE](LICENSE) for details.
 
-## 📄 Лицензия
-
-Проект распространяется под лицензией **MIT License**.  
-Подробности в файле [LICENSE](LICENSE).
-
-```
-
-MIT License - делай что угодно, только оставь копирайт 😉
-
-```
-
----
-
-## 💖 Поддержка проекта  
+## 💖 Support
 
 <div align="center">
 
-### Понравился проект? Поставь ⭐!
+If you like it, drop a ⭐!  
 
 ![Visitors](https://visitor-badge.laobi.icu/badge?page_id=DELMEERs.Hi_GenZ&left_color=gray&right_color=blue)
 ![GitHub Stars](https://img.shields.io/github/stars/DELMEERs/Hi_GenZ?style=social)
 ![GitHub Forks](https://img.shields.io/github/forks/DELMEERs/Hi_GenZ?style=social)
 
-**Создано с 💜 от xd3ll**
-
-*"Пароли могут быть красивыми, как и код, который их создает"*
+*Made with 💜 by xd3ll*  
+_“Passwords can be beautiful, just like the code that crafts them.”_
 
 </div>
 
 ---
+
+<div style="text-align: center">⁂</div>

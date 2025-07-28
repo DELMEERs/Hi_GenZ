@@ -1,836 +1,383 @@
-// Password generator - I also wrote this at 2am 😭
+// Main application entry point
+import { PasswordGenerator } from './js/password-generator.js';
+import { ParticleSystem } from './js/particle-system.js';
+import { BackgroundManager } from './js/background-manager.js';
+import { PasswordDisplay } from './js/password-display.js';
+import { CONFIG, CSS_CLASSES, SELECTORS } from './js/config.js';
+import { Utils } from './js/utils.js';
 
-class PasswordGenUI {
+/**
+ * Main application class that orchestrates all components
+ */
+class PasswordGenApp {
     constructor() {
+        this.isInitialized = false;
         this.init();
-        this.setupEventListeners();
-        this.setupParticles();
-        this.setupButtonAnimation();
-        this.setupPasswordGeneration();
-        this.setupComplexitySelection();
-        this.setupCopyButton();
-        this.isTouch = false;
-        this.lastInteraction = 0;
-        this.animationId = null;
-        this.isGenerating = false;
-        this.currentComplexity = 'chill'; // start with easy mode
-        this.generatedPassword = '';
-
-        // throttle events cuz performance
-        this.throttledMouseMove = this.throttle(this.handleMouseMove.bind(this), 16);
-        this.throttledTouchMove = this.throttle(this.handleTouchMove.bind(this), 16);
     }
 
-    init() {
-        // grab DOM elements
-        this.backgroundContainer = document.getElementById('backgroundContainer');
-        this.animatedBg = document.getElementById('animatedBg');
-        this.cursorLight = document.getElementById('cursorLight');
-        this.circles = document.querySelectorAll('.gradient-circle');
-        this.canvas = document.getElementById('particleCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.genzButton = document.getElementById('genzButton');
-        this.passwordDisplay = document.getElementById('passwordDisplay');
-        this.generationOverlay = document.getElementById('generationOverlay');
-        this.dnaCanvas = document.getElementById('dnaCanvas');
-        this.dnaCtx = this.dnaCanvas.getContext('2d');
-        this.copyButton = document.getElementById('copyButton');
-        this.complexityButtons = {
-            chill: document.getElementById('chillBtn'),
-            lit: document.getElementById('litBtn'),
-            fire: document.getElementById('fireBtn')
-        };
-
-        this.setupCanvas();
-        this.setupDNACanvas();
-        this.particles = [];
-        this.mouse = { x: 0, y: 0 };
-        this.targetMouse = { x: 0, y: 0 };
-        this.dnaAnimationId = null;
-        this.quantumParticles = [];
+    /**
+     * Initialize the application
+     */
+    async init() {
+        try {
+            // Wait for DOM to be ready
+            await this.waitForDOM();
+            
+            // Initialize core components
+            this.initializeComponents();
+            this.initializeState();
+            this.setupEventListeners();
+            this.setupCustomEvents();
+            
+            this.isInitialized = true;
+            console.log('Hi GenZ Password Generator initialized successfully! 🚀');
+            
+        } catch (error) {
+            console.error('Failed to initialize application:', error);
+        }
     }
 
-    setupCanvas() {
-        const resizeCanvas = () => {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-        };
-
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-    }
-
-    setupDNACanvas() {
-        const resizeDNACanvas = () => {
-            const container = this.passwordDisplay.parentElement;
-            this.dnaCanvas.width = container.offsetWidth;
-            this.dnaCanvas.height = container.offsetHeight;
-        };
-
-        resizeDNACanvas();
-        window.addEventListener('resize', resizeDNACanvas);
-    }
-
-    setupEventListeners() {
-        // mouse stuff for desktop
-        document.addEventListener('mousemove', this.throttledMouseMove);
-        document.addEventListener('mouseenter', () => {
-            this.cursorLight.classList.add('active');
-        });
-        document.addEventListener('mouseleave', () => {
-            this.cursorLight.classList.remove('active');
-        });
-
-        // touch events for mobile (annoying but necessary)
-        document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
-        document.addEventListener('touchmove', this.throttledTouchMove, { passive: false });
-        document.addEventListener('touchend', this.handleTouchEnd.bind(this));
-
-        // click effects but not on buttons
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.genz-button') && !e.target.closest('.complexity-btn') && !e.target.closest('.copy-button')) {
-                this.handleClick(e);
+    /**
+     * Wait for DOM to be ready
+     */
+    waitForDOM() {
+        return new Promise((resolve) => {
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', resolve);
+            } else {
+                resolve();
             }
         });
-
-        // mobile orientation stuff
-        if (window.DeviceOrientationEvent) {
-            window.addEventListener('deviceorientation', this.handleDeviceOrientation.bind(this));
-        }
-
-        // performance monitoring
-        document.addEventListener('visibilitychange', this.handleVisibilityChange.bind(this));
     }
 
-    setupButtonAnimation() {
-        this.genzButton.addEventListener('click', this.handleButtonClick.bind(this));
+    /**
+     * Initialize all components
+     */
+    initializeComponents() {
+        // Initialize password generator
+        this.passwordGenerator = new PasswordGenerator();
+        
+        // Initialize particle system
+        const particleCanvas = document.querySelector(SELECTORS.PARTICLE_CANVAS);
+        this.particleSystem = new ParticleSystem(particleCanvas);
+        
+        // Initialize background manager
+        this.backgroundManager = new BackgroundManager();
+        
+        // Initialize password display
+        this.passwordDisplay = new PasswordDisplay();
+
+        // Get DOM elements
+        this.elements = {
+            genzButton: document.querySelector(SELECTORS.GENZ_BUTTON),
+            copyButton: document.querySelector(SELECTORS.COPY_BUTTON),
+            complexityButtons: {
+                chill: document.querySelector(SELECTORS.COMPLEXITY_BUTTONS.chill),
+                lit: document.querySelector(SELECTORS.COMPLEXITY_BUTTONS.lit),
+                fire: document.querySelector(SELECTORS.COMPLEXITY_BUTTONS.fire)
+            }
+        };
     }
 
-    setupComplexitySelection() {
-        Object.entries(this.complexityButtons).forEach(([complexity, button]) => {
+    /**
+     * Initialize application state
+     */
+    initializeState() {
+        this.isGenerating = false;
+        this.currentComplexity = 'chill';
+        this.generatedPassword = '';
+        
+        // Set initial complexity
+        this.setComplexity('chill');
+    }
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+        // Generate button
+        this.elements.genzButton.addEventListener('click', this.handleGenerateClick.bind(this));
+        
+        // Copy button
+        this.elements.copyButton.addEventListener('click', this.handleCopyClick.bind(this));
+        
+        // Complexity buttons
+        Object.entries(this.elements.complexityButtons).forEach(([complexity, button]) => {
             button.addEventListener('click', () => this.setComplexity(complexity));
         });
+
+        // Global click effects (excluding buttons)
+        document.addEventListener('click', this.handleGlobalClick.bind(this));
+
+        // Mouse/touch events for particle trails
+        document.addEventListener('mousemove', 
+            Utils.throttle(this.handleMouseMove.bind(this), CONFIG.ANIMATION_THROTTLE)
+        );
+        document.addEventListener('touchmove', 
+            Utils.throttle(this.handleTouchMove.bind(this), CONFIG.ANIMATION_THROTTLE),
+            { passive: false }
+        );
+
+        // Disable context menu
+        document.addEventListener('contextmenu', e => e.preventDefault());
     }
 
-    setupCopyButton() {
-        this.copyButton.addEventListener('click', this.handleCopyClick.bind(this));
+    /**
+     * Setup custom events for component communication
+     */
+    setupCustomEvents() {
+        // Listen for character burst events from password display
+        document.addEventListener('characterBurst', this.handleCharacterBurst.bind(this));
     }
 
-    setComplexity(complexity) {
-        this.currentComplexity = complexity;
+    /**
+     * Handle generate button click
+     * @param {Event} e - Click event
+     */
+    async handleGenerateClick(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        // update button states
-        Object.entries(this.complexityButtons).forEach(([key, button]) => {
-            if (key === complexity) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-
-        console.log(`Mode switched to: ${complexity}`);
-    }
-
-    setupPasswordGeneration() {
-        // nothing here, generation happens on button click
-    }
-
-    // easy passwords - good for most stuff
-    generateChillPassword() {
-        const words = ['Cat', 'Dog', 'Sun', 'Moon', 'Star', 'Blue', 'Red', 'Cool', 'Nice', 'Fun'];
-        const numbers = '123456789';
-        const symbols = '!@#';
-
-        const word1 = words[Math.floor(Math.random() * words.length)];
-        const word2 = words[Math.floor(Math.random() * words.length)];
-        const num1 = numbers[Math.floor(Math.random() * numbers.length)];
-        const num2 = numbers[Math.floor(Math.random() * numbers.length)];
-        const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-
-        return `${word1}${word2}${num1}${num2}${symbol}`;
-    }
-
-    // medium strength passwords
-    generateLitPassword() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-        const length = 12;
-        let password = '';
-
-        // make sure we have one of each type
-        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-        const numbers = '0123456789';
-        const symbols = '!@#$%^&*';
-
-        password += uppercase[Math.floor(Math.random() * uppercase.length)];
-        password += lowercase[Math.floor(Math.random() * lowercase.length)];
-        password += numbers[Math.floor(Math.random() * numbers.length)];
-        password += symbols[Math.floor(Math.random() * symbols.length)];
-
-        // fill the rest randomly
-        for (let i = 4; i < length; i++) {
-            password += chars[Math.floor(Math.random() * chars.length)];
-        }
-
-        // shuffle it
-        return password.split('').sort(() => Math.random() - 0.5).join('');
-    }
-
-    // max security passwords - for important stuff
-    generateFirePassword() {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}+=<>?~`|:;,.^-_';
-        const length = 19;
-        let password = '';
-
-        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
-        const numbers = '0123456789';
-        const symbols = '!@#$%^&*()[]{}+=<>?~`|:;,.^-_';
-
-        // add multiple of each type
-        for (let i = 0; i < 3; i++) {
-            password += uppercase[Math.floor(Math.random() * uppercase.length)];
-            password += lowercase[Math.floor(Math.random() * lowercase.length)];
-            password += numbers[Math.floor(Math.random() * numbers.length)];
-            password += symbols[Math.floor(Math.random() * symbols.length)];
-        }
-
-        // fill to target length
-        while (password.length < length) {
-            password += chars[Math.floor(Math.random() * chars.length)];
-        }
-
-        // shuffle multiple times for extra randomness
-        for (let i = 0; i < 5; i++) {
-            password = password.split('').sort(() => Math.random() - 0.5).join('');
-        }
-
-        return password;
-    }
-
-    generatePassword() {
-        let password = '';
-
-        switch (this.currentComplexity) {
-            case 'chill':
-                password = this.generateChillPassword();
-                break;
-            case 'lit':
-                password = this.generateLitPassword();
-                break;
-            case 'fire':
-                password = this.generateFirePassword();
-                break;
-            default:
-                password = this.generateLitPassword();
-        }
-
-        this.generatedPassword = password;
-        console.log(`Generated ${this.currentComplexity} password:`, password);
-        return password;
-    }
-
-    async startPasswordGeneration() {
         if (this.isGenerating) return;
 
         this.isGenerating = true;
-        this.genzButton.disabled = true;
-        this.copyButton.classList.add('hidden');
+        this.elements.genzButton.disabled = true;
+        this.elements.copyButton.classList.add(CSS_CLASSES.COPY_HIDDEN);
 
-        // phase 1: prep
-        this.passwordDisplay.classList.add('preparing');
-        await this.wait(800);
+        try {
+            // Visual effects
+            await this.createButtonEffects(e);
+            
+            // Generate password
+            this.generatedPassword = this.passwordGenerator.generate();
+            console.log(`Generated ${this.currentComplexity} password:`, this.generatedPassword);
+            
+            // Animate password display
+            await this.passwordDisplay.startGenerationSequence(this.generatedPassword);
+            
+            // Show copy button after animation
+            setTimeout(() => {
+                this.elements.copyButton.classList.remove(CSS_CLASSES.COPY_HIDDEN);
+            }, 500);
 
-        // phase 2: sci-fi mode engage
-        this.generationOverlay.classList.add('active');
-        this.passwordDisplay.classList.remove('preparing');
-        this.passwordDisplay.classList.add('generating');
-
-        // phase 3: particles!
-        this.createQuantumParticles();
-
-        // phase 4: DNA animation
-        await this.playDNAAnimation();
-
-        // phase 5: actually generate the password
-        const newPassword = this.generatePassword();
-
-        // phase 6: reveal mode
-        this.passwordDisplay.classList.remove('generating');
-        this.passwordDisplay.classList.add('revealing');
-
-        // phase 7: typewriter with glitch effects
-        await this.typewriterWithGlitch(newPassword);
-
-        // phase 8: final reveal
-        this.passwordDisplay.classList.remove('revealing');
-        this.passwordDisplay.classList.add('complete');
-
-        // phase 9: show copy button
-        setTimeout(() => {
-            this.copyButton.classList.remove('hidden');
-        }, 500);
-
-        // phase 10: cleanup
-        this.generationOverlay.classList.remove('active');
-        await this.wait(3000);
-
-        this.passwordDisplay.classList.remove('complete');
-        this.cleanupQuantumParticles();
-        this.isGenerating = false;
-        this.genzButton.disabled = false;
+        } catch (error) {
+            console.error('Password generation failed:', error);
+        } finally {
+            this.isGenerating = false;
+            this.elements.genzButton.disabled = false;
+        }
     }
 
+    /**
+     * Create visual effects for button click
+     * @param {Event} e - Click event
+     */
+    async createButtonEffects(e) {
+        const button = e.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        // Button click animation
+        button.classList.add(CSS_CLASSES.BUTTON_CLICKED);
+        setTimeout(() => {
+            button.classList.remove(CSS_CLASSES.BUTTON_CLICKED);
+        }, 1200);
+
+        // Create visual effects
+        this.createRipple(e, button);
+        this.backgroundManager.createShockwave(centerX, centerY);
+        this.particleSystem.createSparkles(centerX, centerY);
+        this.particleSystem.createExplosion(centerX, centerY);
+        this.backgroundManager.createScreenFlash();
+    }
+
+    /**
+     * Create ripple effect on button
+     * @param {Event} e - Click event
+     * @param {HTMLElement} button - Button element
+     */
+    createRipple(e, button) {
+        const rippleContainer = button.querySelector(SELECTORS.RIPPLE_CONTAINER);
+        const rect = button.getBoundingClientRect();
+        
+        const ripple = Utils.createElement('div', {
+            className: 'ripple',
+            style: {
+                left: (e.clientX - rect.left) + 'px',
+                top: (e.clientY - rect.top) + 'px',
+                width: '10px',
+                height: '10px',
+                marginLeft: '-5px',
+                marginTop: '-5px'
+            }
+        });
+
+        rippleContainer.appendChild(ripple);
+
+        setTimeout(() => {
+            Utils.removeElement(ripple);
+        }, 800);
+    }
+
+    /**
+     * Handle copy button click
+     * @param {Event} e - Click event
+     */
     async handleCopyClick(e) {
         e.preventDefault();
         e.stopPropagation();
 
         if (!this.generatedPassword) return;
 
-        // epic pulse animation
-        this.copyButton.classList.add('copying');
+        // Visual feedback
+        this.elements.copyButton.classList.add(CSS_CLASSES.COPY_COPYING);
 
         try {
-            await navigator.clipboard.writeText(this.generatedPassword);
-            console.log('Password copied successfully!');
-
-            // success feedback
-            const originalText = this.copyButton.querySelector('.copy-text').textContent;
-            this.copyButton.querySelector('.copy-text').textContent = 'Copied!';
-
-            setTimeout(() => {
-                this.copyButton.querySelector('.copy-text').textContent = originalText;
-                this.copyButton.classList.remove('copying');
-            }, 2000);
-
-        } catch (err) {
-            console.error('Copy failed:', err);
-
-            // fallback for old browsers
-            const textArea = document.createElement('textarea');
-            textArea.value = this.generatedPassword;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-
-            // show success anyway
-            const originalText = this.copyButton.querySelector('.copy-text').textContent;
-            this.copyButton.querySelector('.copy-text').textContent = 'Copied! ✨';
-
-            setTimeout(() => {
-                this.copyButton.querySelector('.copy-text').textContent = originalText;
-                this.copyButton.classList.remove('copying');
-            }, 2000);
-        }
-    }
-
-    createQuantumParticles() {
-        const particleContainer = document.querySelector('.quantum-particles');
-        particleContainer.innerHTML = '';
-
-        for (let i = 0; i < 20; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'quantum-particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.top = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 3 + 's';
-            particle.style.animationDuration = (Math.random() * 2 + 2) + 's';
-
-            particleContainer.appendChild(particle);
-            this.quantumParticles.push(particle);
-        }
-    }
-
-    cleanupQuantumParticles() {
-        this.quantumParticles.forEach(particle => {
-            if (particle.parentNode) {
-                particle.parentNode.removeChild(particle);
-            }
-        });
-        this.quantumParticles = [];
-    }
-
-    playDNAAnimation() {
-        return new Promise((resolve) => {
-            const duration = 3000;
-            const startTime = Date.now();
-
-            const animateDNA = () => {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / duration;
-
-                // clear canvas
-                this.dnaCtx.clearRect(0, 0, this.dnaCanvas.width, this.dnaCanvas.height);
-
-                // DNA helix stuff
-                const centerX = this.dnaCanvas.width / 2;
-                const centerY = this.dnaCanvas.height / 2;
-                const radius = 40;
-                const helixHeight = 80;
-                const rotationSpeed = progress * 8 * Math.PI;
-
-                // draw DNA strands
-                for (let strand = 0; strand < 2; strand++) {
-                    this.dnaCtx.strokeStyle = strand === 0 ?
-                        `rgba(0, 255, 255, ${0.8 * (1 - progress * 0.3)})` :
-                        `rgba(255, 0, 255, ${0.8 * (1 - progress * 0.3)})`;
-                    this.dnaCtx.lineWidth = 3;
-                    this.dnaCtx.beginPath();
-
-                    for (let i = 0; i <= 50; i++) {
-                        const t = i / 50;
-                        const angle = rotationSpeed + t * 4 * Math.PI + strand * Math.PI;
-                        const x = centerX + Math.cos(angle) * radius;
-                        const y = centerY + (t - 0.5) * helixHeight;
-
-                        if (i === 0) {
-                            this.dnaCtx.moveTo(x, y);
-                        } else {
-                            this.dnaCtx.lineTo(x, y);
-                        }
-                    }
-                    this.dnaCtx.stroke();
-                }
-
-                // draw base pairs (connecting lines)
-                for (let i = 0; i <= 20; i++) {
-                    const t = i / 20;
-                    const angle1 = rotationSpeed + t * 4 * Math.PI;
-                    const angle2 = rotationSpeed + t * 4 * Math.PI + Math.PI;
-
-                    const x1 = centerX + Math.cos(angle1) * radius;
-                    const y1 = centerY + (t - 0.5) * helixHeight;
-                    const x2 = centerX + Math.cos(angle2) * radius;
-                    const y2 = centerY + (t - 0.5) * helixHeight;
-
-                    this.dnaCtx.strokeStyle = `rgba(255, 255, 255, ${0.4 * (1 - progress * 0.5)})`;
-                    this.dnaCtx.lineWidth = 2;
-                    this.dnaCtx.beginPath();
-                    this.dnaCtx.moveTo(x1, y1);
-                    this.dnaCtx.lineTo(x2, y2);
-                    this.dnaCtx.stroke();
-                }
-
-                if (progress < 1) {
-                    this.dnaAnimationId = requestAnimationFrame(animateDNA);
-                } else {
-                    if (this.dnaAnimationId) {
-                        cancelAnimationFrame(this.dnaAnimationId);
-                    }
-                    resolve();
-                }
-            };
-
-            animateDNA();
-        });
-    }
-
-    async typewriterWithGlitch(newPassword) {
-        const chars = newPassword.split('');
-        let currentText = '';
-
-        for (let i = 0; i < chars.length; i++) {
-            // glitch effect before each character
-            for (let glitch = 0; glitch < 3; glitch++) {
-                const randomChar = String.fromCharCode(33 + Math.floor(Math.random() * 94));
-                this.passwordDisplay.textContent = currentText + randomChar + '_'.repeat(chars.length - i - 1);
-                await this.wait(50);
+            const success = await Utils.copyToClipboard(this.generatedPassword);
+            
+            if (success) {
+                console.log('Password copied successfully!');
+                this.showCopyFeedback('Copied!');
+            } else {
+                this.showCopyFeedback('Copy failed');
             }
 
-            // reveal actual character
-            currentText += chars[i];
-            this.passwordDisplay.textContent = currentText + '_'.repeat(chars.length - i - 1);
-
-            // particle burst for each character
-            this.createCharacterBurst(i, chars.length);
-
-            await this.wait(150);
-        }
-
-        // clean final display
-        this.passwordDisplay.textContent = newPassword;
-    }
-
-    createCharacterBurst(charIndex, totalChars) {
-        const rect = this.passwordDisplay.getBoundingClientRect();
-        const charWidth = rect.width / totalChars;
-        const x = rect.left + (charIndex * charWidth) + (charWidth / 2);
-        const y = rect.top + rect.height / 2;
-
-        // mini explosion for each character
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const speed = Math.random() * 2 + 1;
-
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1,
-                decay: 0.03,
-                size: Math.random() * 2 + 1,
-                brightness: 2,
-                color: `hsl(${Math.random() * 60 + 180}, 100%, 70%)`
-            });
+        } catch (error) {
+            console.error('Copy failed:', error);
+            this.showCopyFeedback('Copy failed');
         }
     }
 
-    wait(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    handleButtonClick(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const button = e.currentTarget;
-        const rect = button.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        // main animation
-        button.classList.add('clicked');
-
-        // create all the effects
-        this.createRipple(e, button);
-        this.createShockwave(centerX, centerY);
-        this.createSparkles(centerX, centerY);
-        this.createButtonExplosion(centerX, centerY);
-
-        // remove animation class
-        setTimeout(() => {
-            button.classList.remove('clicked');
-        }, 1200);
-
-        // screen flash
-        this.createScreenFlash();
-
-        // start generation
-        this.startPasswordGeneration();
-
-        console.log('Password generation started!');
-    }
-
-    createRipple(e, button) {
-        const rippleContainer = button.querySelector('.ripple-container');
-        const rect = button.getBoundingClientRect();
-        const ripple = document.createElement('div');
-
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        ripple.className = 'ripple';
-        ripple.style.left = x + 'px';
-        ripple.style.top = y + 'px';
-        ripple.style.width = '10px';
-        ripple.style.height = '10px';
-        ripple.style.marginLeft = '-5px';
-        ripple.style.marginTop = '-5px';
-
-        rippleContainer.appendChild(ripple);
+    /**
+     * Show copy feedback message
+     * @param {string} message - Message to show
+     */
+    showCopyFeedback(message) {
+        const copyText = this.elements.copyButton.querySelector(SELECTORS.COPY_TEXT);
+        const originalText = copyText.textContent;
+        
+        copyText.textContent = message;
 
         setTimeout(() => {
-            ripple.remove();
-        }, 800);
+            copyText.textContent = originalText;
+            this.elements.copyButton.classList.remove(CSS_CLASSES.COPY_COPYING);
+        }, 2000);
     }
 
-    createShockwave(x, y) {
-        const shockwave = document.createElement('div');
-        shockwave.className = 'shockwave';
-        shockwave.style.left = x + 'px';
-        shockwave.style.top = y + 'px';
+    /**
+     * Set password complexity level
+     * @param {string} complexity - Complexity level
+     */
+    setComplexity(complexity) {
+        this.currentComplexity = complexity;
+        this.passwordGenerator.setComplexity(complexity);
 
-        document.body.appendChild(shockwave);
+        // Update button states
+        Object.entries(this.elements.complexityButtons).forEach(([key, button]) => {
+            if (key === complexity) {
+                button.classList.add(CSS_CLASSES.COMPLEXITY_ACTIVE);
+            } else {
+                button.classList.remove(CSS_CLASSES.COMPLEXITY_ACTIVE);
+            }
+        });
 
-        setTimeout(() => {
-            shockwave.remove();
-        }, 800);
+        console.log(`Complexity set to: ${complexity}`);
     }
 
-    createSparkles(centerX, centerY) {
-        for (let i = 0; i < 15; i++) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
-
-            const angle = (i / 15) * Math.PI * 2;
-            const distance = 80 + Math.random() * 60;
-            const x = centerX + Math.cos(angle) * distance;
-            const y = centerY + Math.sin(angle) * distance;
-
-            sparkle.style.left = x + 'px';
-            sparkle.style.top = y + 'px';
-            sparkle.style.animationDelay = Math.random() * 0.5 + 's';
-
-            document.body.appendChild(sparkle);
-
-            setTimeout(() => {
-                sparkle.remove();
-            }, 1500);
+    /**
+     * Handle global clicks for particle effects
+     * @param {Event} e - Click event
+     */
+    handleGlobalClick(e) {
+        // Only create effects for non-button clicks
+        if (!e.target.closest('button') && !e.target.closest('a')) {
+            this.particleSystem.createClickEffect(e.clientX, e.clientY);
         }
     }
 
-    createButtonExplosion(x, y) {
-        // multiple waves of particles
-        for (let wave = 0; wave < 4; wave++) {
-            setTimeout(() => {
-                for (let i = 0; i < 30; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 10 + 5;
-                    const size = Math.random() * 8 + 2;
-
-                    this.particles.push({
-                        x: x,
-                        y: y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        life: 1,
-                        decay: 0.008 + Math.random() * 0.012,
-                        size: size,
-                        brightness: 2 + Math.random(),
-                        color: 'white'
-                    });
-                }
-            }, wave * 150);
-        }
-    }
-
-    createScreenFlash() {
-        const flash = document.createElement('div');
-        flash.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(0,255,255,0.2) 50%, transparent 80%);
-            pointer-events: none;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
-        `;
-
-        document.body.appendChild(flash);
-
-        setTimeout(() => {
-            flash.style.opacity = '0';
-            setTimeout(() => {
-                flash.remove();
-            }, 800);
-        }, 100);
-    }
-
+    /**
+     * Handle mouse movement for particle trails
+     * @param {Event} e - Mouse event
+     */
     handleMouseMove(e) {
-        if (this.isTouch) return;
-
-        this.targetMouse.x = e.clientX;
-        this.targetMouse.y = e.clientY;
-        this.lastInteraction = Date.now();
-
-        this.updateCursorLight();
-        this.updateCircleInteractions();
-        this.createParticleTrail(e.clientX, e.clientY);
+        this.particleSystem.createTrailParticles(e.clientX, e.clientY);
     }
 
-    handleTouchStart(e) {
-        this.isTouch = true;
-        const touch = e.touches[0];
-        this.targetMouse.x = touch.clientX;
-        this.targetMouse.y = touch.clientY;
-        this.cursorLight.classList.add('active');
-        this.lastInteraction = Date.now();
-    }
-
+    /**
+     * Handle touch movement for particle trails
+     * @param {Event} e - Touch event
+     */
     handleTouchMove(e) {
-        e.preventDefault();
-        const touch = e.touches[0];
-        this.targetMouse.x = touch.clientX;
-        this.targetMouse.y = touch.clientY;
-        this.lastInteraction = Date.now();
-
-        this.updateCursorLight();
-        this.updateCircleInteractions();
-        this.createParticleTrail(touch.clientX, touch.clientY);
-    }
-
-    handleTouchEnd() {
-        setTimeout(() => {
-            this.cursorLight.classList.remove('active');
-        }, 1000);
-    }
-
-    handleClick(e) {
-        this.createClickEffect(e.clientX, e.clientY);
-    }
-
-    handleDeviceOrientation(e) {
-        const tiltX = e.gamma;
-        const tiltY = e.beta;
-
-        if (tiltX !== null && tiltY !== null) {
-            this.animatedBg.style.transform = `translate(${tiltX * 0.5}px, ${tiltY * 0.5}px)`;
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            this.particleSystem.createTrailParticles(touch.clientX, touch.clientY);
         }
     }
 
-    handleVisibilityChange() {
-        if (document.hidden) {
-            this.pauseAnimations();
-        } else {
-            this.resumeAnimations();
+    /**
+     * Handle character burst events from password display
+     * @param {CustomEvent} e - Character burst event
+     */
+    handleCharacterBurst(e) {
+        const { charIndex, totalChars, container } = e.detail;
+        this.particleSystem.createCharacterBurst(charIndex, totalChars, container);
+    }
+
+    /**
+     * Get application status
+     * @returns {Object} Status information
+     */
+    getStatus() {
+        return {
+            initialized: this.isInitialized,
+            generating: this.isGenerating,
+            complexity: this.currentComplexity,
+            hasPassword: !!this.generatedPassword,
+            particleCount: this.particleSystem.getParticleCount()
+        };
+    }
+
+    /**
+     * Reset application to initial state
+     */
+    reset() {
+        this.generatedPassword = '';
+        this.passwordDisplay.reset();
+        this.elements.copyButton.classList.add(CSS_CLASSES.COPY_HIDDEN);
+        this.particleSystem.clear();
+        this.setComplexity('chill');
+    }
+
+    /**
+     * Destroy the application and clean up resources
+     */
+    destroy() {
+        if (this.particleSystem) {
+            this.particleSystem.stop();
         }
-    }
-
-    updateCursorLight() {
-        this.mouse.x += (this.targetMouse.x - this.mouse.x) * 0.1;
-        this.mouse.y += (this.targetMouse.y - this.mouse.y) * 0.1;
-
-        this.cursorLight.style.left = this.mouse.x + 'px';
-        this.cursorLight.style.top = this.mouse.y + 'px';
-    }
-
-    updateCircleInteractions() {
-        this.circles.forEach((circle, index) => {
-            const rect = circle.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-
-            const distance = Math.sqrt(
-                Math.pow(this.mouse.x - centerX, 2) +
-                Math.pow(this.mouse.y - centerY, 2)
-            );
-
-            const maxDistance = 300;
-            const interactionStrength = Math.max(0, 1 - distance / maxDistance);
-
-            circle.classList.remove('attracted', 'repelled');
-
-            if (interactionStrength > 0.3) {
-                circle.classList.add('attracted');
-
-                const pullStrength = interactionStrength * 20;
-                const angle = Math.atan2(this.mouse.y - centerY, this.mouse.x - centerX);
-                const offsetX = Math.cos(angle) * pullStrength;
-                const offsetY = Math.sin(angle) * pullStrength;
-
-                circle.style.transform += ` translate(${offsetX}px, ${offsetY}px)`;
-            } else if (interactionStrength > 0.1) {
-                circle.classList.add('repelled');
-            }
-        });
-    }
-
-    setupParticles() {
-        this.animate();
-    }
-
-    createParticleTrail(x, y) {
-        if (this.particles.length > 80) return;
-
-        for (let i = 0; i < 3; i++) {
-            this.particles.push({
-                x: x + (Math.random() - 0.5) * 20,
-                y: y + (Math.random() - 0.5) * 20,
-                vx: (Math.random() - 0.5) * 2,
-                vy: (Math.random() - 0.5) * 2,
-                life: 1,
-                decay: 0.02 + Math.random() * 0.02,
-                size: Math.random() * 3 + 1,
-                brightness: 1,
-                color: 'white'
-            });
+        
+        if (this.backgroundManager) {
+            this.backgroundManager.destroy();
         }
-    }
-
-    createClickEffect(x, y) {
-        for (let i = 0; i < 20; i++) {
-            const angle = (i / 20) * Math.PI * 2;
-            const speed = Math.random() * 4 + 2;
-            this.particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1,
-                decay: 0.015,
-                size: Math.random() * 5 + 2,
-                brightness: 1.5,
-                color: 'white'
-            });
-        }
-    }
-
-    updateParticles() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            const particle = this.particles[i];
-
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-            particle.life -= particle.decay;
-            particle.vx *= 0.99;
-            particle.vy *= 0.99;
-
-            if (particle.life <= 0) {
-                this.particles.splice(i, 1);
-                continue;
-            }
-
-            this.ctx.save();
-            this.ctx.globalAlpha = particle.life;
-            this.ctx.shadowBlur = 20 * (particle.brightness || 1);
-            this.ctx.shadowColor = particle.color || 'white';
-            this.ctx.fillStyle = particle.color || 'white';
-            this.ctx.beginPath();
-            this.ctx.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.restore();
-        }
-    }
-
-    animate() {
-        this.updateParticles();
-        this.updateCursorLight();
-
-        if (Date.now() - this.lastInteraction > 3000 && !this.isTouch) {
-            this.cursorLight.classList.remove('active');
+        
+        if (this.passwordDisplay) {
+            this.passwordDisplay.destroy();
         }
 
-        this.animationId = requestAnimationFrame(() => this.animate());
-    }
+        // Remove event listeners
+        document.removeEventListener('click', this.handleGlobalClick);
+        document.removeEventListener('mousemove', this.handleMouseMove);
+        document.removeEventListener('touchmove', this.handleTouchMove);
+        document.removeEventListener('characterBurst', this.handleCharacterBurst);
+        document.removeEventListener('contextmenu', e => e.preventDefault());
 
-    pauseAnimations() {
-        if (this.animationId) {
-            cancelAnimationFrame(this.animationId);
-        }
-        if (this.dnaAnimationId) {
-            cancelAnimationFrame(this.dnaAnimationId);
-        }
-    }
-
-    resumeAnimations() {
-        this.animate();
-    }
-
-    throttle(func, limit) {
-        let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
-            if (!inThrottle) {
-                func.apply(context, args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        }
+        console.log('Application destroyed');
     }
 }
 
-// start everything when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    new PasswordGenUI();
-});
+// Initialize the application when the page loads
+const app = new PasswordGenApp();
 
-// disable right click menu on mobile
-document.addEventListener('contextmenu', e => e.preventDefault());
+// Make app globally available for debugging
+window.PasswordGenApp = app;
